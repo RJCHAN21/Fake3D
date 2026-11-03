@@ -1,13 +1,18 @@
 using UnityEngine;
 
+// Doing this so the movement can happen before projection
+[DefaultExecutionOrder(100)]
 public class Item : MonoBehaviour
 {
     public Vector3 itemPosition;
     private SpriteRenderer spriteRenderer;
+    [SerializeField] private bool randomizeColor = true;
+    
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        if(spriteRenderer != null)
+
+        if (spriteRenderer != null && randomizeColor)
         {
             spriteRenderer.color = GetRandomColor();
         }
@@ -15,9 +20,15 @@ public class Item : MonoBehaviour
 
     private void LateUpdate()
     {
-        var perspective = CameraComponent.focalLength / (CameraComponent.focalLength + itemPosition.z);
+        float perspective = CameraComponent.focalLength / (CameraComponent.focalLength + itemPosition.z);
+
         transform.localScale = Vector3.one * perspective;
         transform.position = new Vector3(itemPosition.x, itemPosition.y, 0f) * perspective;
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingOrder = -Mathf.RoundToInt(itemPosition.z);
+        }
     }
 
     private Color GetRandomColor()

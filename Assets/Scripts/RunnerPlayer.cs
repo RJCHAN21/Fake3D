@@ -11,7 +11,11 @@ public class RunnerPlayer : MonoBehaviour
     [SerializeField] private float groundY = -3f;
     [SerializeField] private float jumpSpeed = 8f;
     [SerializeField] private float gravity = 20f;
+    [SerializeField, Min(0.01f)] private float laneChangeDuration = 0.2f;
 
+    private float laneStartX;
+    private float laneTargetX;
+    private float laneElapsed;
     private int lane = 1;
     private bool moveHeld;
     private bool grounded = true;
@@ -46,17 +50,30 @@ public class RunnerPlayer : MonoBehaviour
         float horizontal = moveAction.action.ReadValue<Vector2>().x;
 
         if (Mathf.Abs(horizontal) <= 0.5f)
-        {
             moveHeld = false;
-        }
+
         else if (!moveHeld)
         {
             int direction = horizontal > 0f ? 1 : -1;
-            lane = Mathf.Clamp(lane + direction, 0, 2);
+            int nextLane = Mathf.Clamp(lane + direction, 0, 2);
+
+            if (nextLane != lane)
+            {
+                lane = nextLane;
+                laneStartX = playerItem.itemPosition.x;
+                laneTargetX = (lane - 1) * laneSpacing;
+                laneElapsed = 0f;
+            }
+
             moveHeld = true;
         }
 
-        playerItem.itemPosition.x = (lane - 1) * laneSpacing;
+        laneElapsed += Time.deltaTime;
+
+        float t = laneElapsed / Mathf.Max(0.01f, laneChangeDuration);
+        float easedT = Ease.SmoothStep(t);
+
+        playerItem.itemPosition.x = laneStartX + (laneTargetX - laneStartX) * easedT;
     }
 
     private void UpdateJump()
@@ -67,17 +84,11 @@ public class RunnerPlayer : MonoBehaviour
             grounded = false;
         }
 
-        if (grounded)
-        {
-            return;
-        }
+        if (grounded) return;
 
         float deltaTime = Time.deltaTime;
 
-        playerItem.itemPosition.y +=
-            verticalSpeed * deltaTime -
-            0.5f * gravity * deltaTime * deltaTime;
-
+        playerItem.itemPosition.y += verticalSpeed * deltaTime - 0.5f * gravity * deltaTime * deltaTime;
         verticalSpeed -= gravity * deltaTime;
 
         if (playerItem.itemPosition.y <= groundY)
