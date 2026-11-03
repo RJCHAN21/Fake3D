@@ -4,6 +4,7 @@ using UnityEngine.Pool;
 
 public class ObstacleSpawner : MonoBehaviour
 {
+#region Public Fields
     public Item itemToSpawn;
     public float speed = 0.01f;
     public List<Item> items = new List<Item>();
@@ -13,13 +14,18 @@ public class ObstacleSpawner : MonoBehaviour
     public float maxVertical;
     public float minVertical;
     public float spawnZ = 900f;
+#endregion
 
+#region Serialized Fields
     [SerializeField] private Item playerItem;
     [SerializeField] private RunnerHealth playerHealth;
     [SerializeField] private Vector3 hitRange = new Vector3(1f, 1f, 20f);
+#endregion
 
+#region Private Fields
     private int nextLane;
     private ObjectPool<Item> pool;
+#endregion
 
 #region Unity Life Cycle
     private void Awake()
@@ -76,6 +82,7 @@ public class ObstacleSpawner : MonoBehaviour
     }
 #endregion
 
+#region Spawn & Movement Logic
     private void BeginSpawn()
     {
         Item spawnedItem = pool.Get();
@@ -101,6 +108,7 @@ public class ObstacleSpawner : MonoBehaviour
     {
         item.itemPosition.z -= speed * Time.deltaTime;
     }
+#endregion
 
 #region Object Pooling
     private Item CreateObstacle()

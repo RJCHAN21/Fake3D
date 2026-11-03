@@ -6,6 +6,7 @@ using TMPro;
 
 public class GameOverScreen : MonoBehaviour
 {
+#region Serialized Fields
     [SerializeField] private Image flashImage;
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private RunnerPlayer player;
@@ -15,9 +16,13 @@ public class GameOverScreen : MonoBehaviour
     [SerializeField, Min(0.01f)] private float flashDuration = 0.2f;
     [SerializeField, Min(0f)] private float textHoldDuration = 0.5f;
     [SerializeField, Min(0.01f)] private float textFadeDuration = 1f;
+#endregion
 
+#region Private Fields
     private bool playing;
+#endregion
 
+#region Game Over Logic
     public void Play()
     {
         if (playing)
@@ -50,7 +55,9 @@ public class GameOverScreen : MonoBehaviour
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+#endregion
 
+#region Fade Logic
     private IEnumerator FadeOut(Graphic graphic, float duration)
     {
         duration = Mathf.Max(0.01f, duration);
@@ -70,4 +77,5 @@ public class GameOverScreen : MonoBehaviour
             yield return null;
         }
     }
+#endregion
 }

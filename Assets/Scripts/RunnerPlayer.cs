@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class RunnerPlayer : MonoBehaviour
 {
+#region Serialized Fields
     [SerializeField] private Item playerItem;
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference jumpAction;
@@ -12,7 +13,9 @@ public class RunnerPlayer : MonoBehaviour
     [SerializeField] private float jumpSpeed = 8f;
     [SerializeField] private float gravity = 20f;
     [SerializeField, Min(0.01f)] private float laneChangeDuration = 0.2f;
+#endregion
 
+#region Private Fields
     private float laneStartX;
     private float laneTargetX;
     private float laneElapsed;
@@ -20,7 +23,9 @@ public class RunnerPlayer : MonoBehaviour
     private bool moveHeld;
     private bool grounded = true;
     private float verticalSpeed;
+#endregion
 
+#region Unity Life Cycle
     private void Awake()
     {
         playerItem.itemPosition = new Vector3(0f, groundY, 0f);
@@ -44,7 +49,9 @@ public class RunnerPlayer : MonoBehaviour
         UpdateLane();
         UpdateJump();
     }
+#endregion
 
+#region Movement Logic
     private void UpdateLane()
     {
         float horizontal = moveAction.action.ReadValue<Vector2>().x;
@@ -98,4 +105,5 @@ public class RunnerPlayer : MonoBehaviour
             grounded = true;
         }
     }
+#endregion
 }

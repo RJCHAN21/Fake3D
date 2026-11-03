@@ -4,16 +4,21 @@ using TMPro;
 
 public class RunnerHealth : MonoBehaviour
 {
+#region Serialized Fields
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private GameOverScreen gameOverScreen;
     [SerializeField] private Image damageFlash;
     [SerializeField, Min(0.01f)] private float damageFlashDuration = 0.15f;
+#endregion
 
+#region Private Fields
     private float damageFlashElapsed;
     private bool dead;
     private int health = 100;
     private float regenerationTimer;
+#endregion
 
+#region Unity Life Cycle
     private void Start()
     {
         RefreshText();
@@ -37,7 +42,9 @@ public class RunnerHealth : MonoBehaviour
             }
         }
     }
+#endregion
 
+#region Health Logic
     public void TakeDamage()
     {
         if (dead) return;
@@ -61,7 +68,9 @@ public class RunnerHealth : MonoBehaviour
 
         damageFlash.gameObject.SetActive(true);
     }
-    
+#endregion
+
+#region UI Logic
     private void RefreshText()
     {
         healthText.text = $"HP: {health}/100";
@@ -87,4 +96,5 @@ public class RunnerHealth : MonoBehaviour
             damageFlash.gameObject.SetActive(false);
         }
     }
+#endregion
 }

@@ -4,11 +4,14 @@ using UnityEngine;
 [DefaultExecutionOrder(100)]
 public class Item : MonoBehaviour
 {
+#region Fields
     public Vector3 itemPosition;
     [SerializeField] private bool randomizeColor = true;
 
     private SpriteRenderer spriteRenderer;
-    
+#endregion
+
+#region Unity Life Cycle
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -35,7 +38,9 @@ public class Item : MonoBehaviour
             spriteRenderer.sortingOrder = -Mathf.RoundToInt(itemPosition.z);
         }
     }
+#endregion
 
+#region Visual Randomizer Logic
     private Color GetRandomColor()
     {
         var rRand = Random.Range(0f, 1f);
@@ -43,4 +48,5 @@ public class Item : MonoBehaviour
         var bRand = Random.Range(0f, 1f);
         return new Color(rRand, gRand, bRand);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
     }
+#endregion
 }
