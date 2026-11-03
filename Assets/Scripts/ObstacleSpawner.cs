@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class ObstacleSpawner : MonoBehaviour
 {
@@ -18,32 +19,25 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] private Vector3 hitRange = new Vector3(1f, 1f, 20f);
 
     private int nextLane;
+    private ObjectPool<Item> pool;
+
+#region Unity Life Cycle
+    private void Awake()
+    {
+        pool = new ObjectPool<Item>(
+            CreateObstacle,
+            ActivateObstacle,
+            DeactivateObstacle,
+            DestroyObstacle,
+            true,
+            16,
+            32
+        );
+    }
 
     private void Start()
     {
         InvokeRepeating(nameof(BeginSpawn), 1, 0.3f);
-    }
-
-    private void BeginSpawn()
-    {
-        var spawnedItem = Instantiate(itemToSpawn, parent);
-        spawnedItem.itemPosition = GetRandomLocation();
-        items.Add(spawnedItem);
-    }
-
-    private Vector3 GetRandomLocation()
-    {
-        float laneSpacing = (maxHorizontal - minHorizontal) / 2f;
-        float x = minHorizontal + nextLane * laneSpacing;
-
-        nextLane++;
-
-        if (nextLane > 2)
-        {
-            nextLane = 0;
-        }
-
-        return new Vector3(x, minVertical, spawnZ);
     }
 
     private void LateUpdate()
@@ -71,13 +65,66 @@ public class ObstacleSpawner : MonoBehaviour
             if (hit || item.itemPosition.z <= -100f)
             {
                 items.RemoveAt(i);
-                Destroy(item.gameObject);
+                pool.Release(item);
             }
         }
+    }  
+
+    private void OnDestroy()
+    {
+        pool?.Clear();
+    }
+#endregion
+
+    private void BeginSpawn()
+    {
+        Item spawnedItem = pool.Get();
+        items.Add(spawnedItem);
+    }
+
+    private Vector3 GetRandomLocation()
+    {
+        float laneSpacing = (maxHorizontal - minHorizontal) / 2f;
+        float x = minHorizontal + nextLane * laneSpacing;
+
+        nextLane++;
+
+        if (nextLane > 2)
+        {
+            nextLane = 0;
+        }
+
+        return new Vector3(x, minVertical, spawnZ);
     }
 
     private void ItemMover(Item item)
     {
         item.itemPosition.z -= speed * Time.deltaTime;
     }
+
+#region Object Pooling
+    private Item CreateObstacle()
+    {
+        return Instantiate(itemToSpawn, parent);
+    }
+
+    private void ActivateObstacle(Item item)
+    {
+        item.itemPosition = GetRandomLocation();
+        item.gameObject.SetActive(true);
+    }
+
+    private void DeactivateObstacle(Item item)
+    {
+        item.gameObject.SetActive(false);
+    }
+
+    private void DestroyObstacle(Item item)
+    {
+        if (item != null)
+        {
+            Destroy(item.gameObject);
+        }
+    }
+#endregion
 }

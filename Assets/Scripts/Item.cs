@@ -5,13 +5,18 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     public Vector3 itemPosition;
-    private SpriteRenderer spriteRenderer;
     [SerializeField] private bool randomizeColor = true;
+
+    private SpriteRenderer spriteRenderer;
     
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
+
+    private void OnEnable()
+    {
         if (spriteRenderer != null && randomizeColor)
         {
             spriteRenderer.color = GetRandomColor();
